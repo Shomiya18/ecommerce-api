@@ -88,3 +88,10 @@ def product_delete(product_id = int, db :Session = Depends(get_db)):
     return {"message": "Product deleted successfully"}
 
 
+@app.get("/products/filter", response_model= list[ProductResponse])
+def filter_product(min_price :float, db: Session= Depends(get_db)):
+    products = db.query(Product).filter(Product.price>min_price).all()
+    return products
+
+
+
