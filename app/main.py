@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Depends
+from fastapi import FastAPI,Depends , HTTPException  #depends help krta h baar baar session create krne ka code nhi likhna pdta 
 from app.schemas import ProductCreate, ProductResponse
 from sqlalchemy.orm import Session
 from app.dependencies import get_db
@@ -13,15 +13,6 @@ app = FastAPI()
 @app.get("/")
 def home():
     return {"message": "Welcome to ECommerce API!"}
-
-@app.get("/products/{product_id}")
-def get_product(product_id: int):
-    return {
-        "product_id": product_id,
-        "name": "Sample Product",
-        "price": 99
-    }
-
 
 @app.get("/search")
 def search_products(category: str, brand_name: str):
@@ -42,3 +33,58 @@ def create_product(product: ProductCreate,db:Session = Depends(get_db)):
     db.commit()                     #data postgresql mei save krta h 
     db.refresh(new_product)         #database se updated values lata h
     return new_product
+
+@app.get("/products",response_model=list[ProductResponse])
+def get_products(db: Session = Depends(get_db)):
+    products = db.query(Product).all()
+    return products
+
+@app.get("/products/{product_id}", response_model= ProductResponse)
+def get_product(product_id: int,db: Session = Depends(get_db)):
+
+    product = db.query(Product).filter(Product.id == product_id).first()
+
+    if(product == None):
+        raise HTTPException(
+            status_code = 404,
+            detail = "Product not found"
+        )
+    return product
+
+@app.put("/products/{product_id}", response_model=ProductResponse)
+def update_product(product_id: int, Updatedproduct: ProductCreate, db:Session = Depends(get_db)):
+    product = db.query(Product).filter(Product.id == product_id).first()
+
+    if product == None:
+        raise HTTPException(
+            status_code= 404,
+            detail= " Product not found"
+        )
+
+    product.name = Updatedproduct.name
+    product.price = Updatedproduct.price
+    product.stock = Updatedproduct.stock
+
+    db.commit()
+    db.refresh(product)
+
+    return product
+
+
+@app.delete("/products/{product_id}", response_model= ProductResponse)
+def product_delete(product_id = int, db :Session = Depends(get_db)):
+
+    product = db.query(Product).filter(Product.id == product_id).first()
+
+    if product == None:
+        raise HTTPException(
+            status_code= 404,
+            detail= "Product not found"
+        )
+    
+    db.delete(product)
+    db.commit()
+
+    return {"message": "Product deleted successfully"}
+
+
