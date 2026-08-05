@@ -7,4 +7,4 @@ DATABASE_URL = "postgresql://shomiyachaturvedi@localhost/ecommerce_db"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind = engine)
 
-Base.metadata.create_all(bind = engine)
+Base.metadata.create_all(bind = engine)  ## it creates all the table which are not created but have used the base to create their models

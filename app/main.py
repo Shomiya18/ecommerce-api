@@ -2,7 +2,7 @@ from fastapi import FastAPI,Depends , HTTPException  #depends help krta h baar b
 from app.schemas import ProductCreate, ProductResponse
 from sqlalchemy.orm import Session
 from app.dependencies import get_db
-from app.models import Product
+from app.models import Product,User 
 
 
 # Basemodel is the parent class for all the models in FastAPI. 
