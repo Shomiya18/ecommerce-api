@@ -11,3 +11,17 @@ class ProductCreate(BaseModel):
 class ProductResponse(BaseModel):
     name: str
     price: float
+
+class UserCreate(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+class UserResponse(BaseModel):
+    name: str
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
